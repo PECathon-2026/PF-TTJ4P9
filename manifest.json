@@ -1,9 +1,11 @@
 {
   "manifest_version": 3,
   "name": "Minimal Browser Extension",
+  "permissions": ["tabs", "activeTab", "scripting", "storage"],
+  "host_permissions": ["<all_urls>"],
   "version": "1.0.0",
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "public/popup.html",
     "default_title": "Open Extension Popup"
   },
   "background": {
@@ -12,7 +14,8 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "run_at": "document_idle"
     }
   ]
 }
