@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>PrivacyLens</title>
+    <style>
+      :root {
+        --bg: #eef1f4;
+        --panel: #fff;
+        --ink: #121a24;
+        --mute: #5b6773;
+        --line: #cfd6de;
+        --bar: #05070a;
+        --ok: #1a7f4b;
+        --bad: #c2362b;
+        --amber: #b9831a;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #10161d;
+          --panel: #18212b;
+          --ink: #e6ebf0;
+          --mute: #93a0ad;
+          --line: #2d3947;
+          --bar: #000;
+          --ok: #4cc38a;
+          --bad: #ff7a6e;
+          --amber: #e0b341;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        width: 540px;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          13px/1.45 system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+      }
+      header {
+        padding: 14px 16px 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid var(--line);
+      }
+      header h1 {
+        font-size: 15px;
+        margin: 0;
+        font-weight: 650;
+        letter-spacing: 0.01em;
+      }
+      .bar {
+        display: inline-block;
+        height: 0.9em;
+        width: 3.2em;
+        background: var(--bar);
+        border-radius: 2px;
+        vertical-align: -0.12em;
+        margin-left: 0.35em;
+      }
+      #mode {
+        margin-left: auto;
+        color: var(--mute);
+        font-size: 12px;
+      }
+      section {
+        padding: 12px 16px;
+      }
+      textarea,
+      input,
+      select {
+        width: 100%;
+        font: inherit;
+        color: var(--ink);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 7px 9px;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 54px;
+      }
+      label {
+        display: block;
+        margin: 9px 0 3px;
+        color: var(--mute);
+        font-size: 12px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+      }
+      button {
+        font: inherit;
+        padding: 6px 12px;
+        border-radius: 5px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        color: var(--ink);
+        cursor: pointer;
+      }
+      button:hover {
+        border-color: var(--mute);
+      }
+      button:focus-visible,
+      input:focus-visible,
+      textarea:focus-visible,
+      select:focus-visible {
+        outline: 2px solid var(--amber);
+        outline-offset: 1px;
+      }
+      button.primary {
+        background: var(--ink);
+        color: var(--bg);
+        border-color: var(--ink);
+        font-weight: 600;
+      }
+      #status {
+        margin: 10px 16px 0;
+        padding: 8px 10px;
+        border-left: 3px solid var(--line);
+        background: var(--panel);
+        min-height: 34px;
+        word-break: break-word;
+      }
+      nav {
+        display: flex;
+        gap: 2px;
+        padding: 0 16px;
+        margin-top: 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      nav button {
+        border: 0;
+        border-bottom: 2px solid transparent;
+        border-radius: 0;
+        background: none;
+        color: var(--mute);
+        padding: 7px 10px;
+      }
+      nav button[aria-selected="true"] {
+        color: var(--ink);
+        border-bottom-color: var(--ink);
+        font-weight: 600;
+      }
+      .pane {
+        display: none;
+      }
+      .pane.on {
+        display: block;
+      }
+      .cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .col h3 {
+        margin: 0 0 4px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--mute);
+      }
+      pre.view {
+        margin: 0;
+        height: 230px;
+        overflow: auto;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 6px;
+        font:
+          11px/1.5 ui-monospace,
+          Menlo,
+          Consolas,
+          monospace;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .chg-b {
+        background: color-mix(in srgb, var(--bad) 18%, transparent);
+        display: block;
+      }
+      .chg-a {
+        background: color-mix(in srgb, var(--ok) 18%, transparent);
+        display: block;
+      }
+      .shots {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .shots img {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+      }
+      #verdict {
+        margin-top: 8px;
+        padding: 8px 10px;
+        border-radius: 5px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+      }
+      #verdict.blocked {
+        border-color: var(--bad);
+      }
+      #verdict.blocked b {
+        color: var(--bad);
+      }
+      .small {
+        color: var(--mute);
+        font-size: 12px;
+      }
+      #log {
+        height: 260px;
+      }
+      .chk {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin: 8px 0 0;
+      }
+      .chk input {
+        width: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>PrivacyLens<span class="bar" aria-hidden="true"></span></h1>
+      <span id="mode"></span>
+    </header>
+
+    <section>
+      <label for="task" style="margin-top: 0"
+        >What should the agent do on this page?</label
+      >
+      <textarea
+        id="task"
+        placeholder="Fill in the checkout form using my saved details and place the order"
+      ></textarea>
+      <div class="row">
+        <button class="primary" id="run">Run agent</button
+        ><button id="stop">Stop</button>
+      </div>
+    </section>
+    <div id="status" role="status" aria-live="polite">Idle.</div>
+
+    <nav role="tablist">
+      <button role="tab" data-t="preview" aria-selected="true">
+        What the model sees
+      </button>
+      <button role="tab" data-t="settings" aria-selected="false">
+        Settings
+      </button>
+      <button role="tab" data-t="log" aria-selected="false">Audit log</button>
+    </nav>
+
+    <section class="pane on" id="p-preview">
+      <div class="row" style="margin-top: 0">
+        <button id="prev">Preview sanitised page</button>
+        <button id="prevShot">Preview with screenshot</button>
+        <button id="unsafe">Try sending raw page (should be blocked)</button>
+      </div>
+      <div id="verdict" hidden></div>
+      <div class="cols" style="margin-top: 8px">
+        <div class="col">
+          <h3>Before (stays on this device)</h3>
+          <pre class="view" id="before"></pre>
+        </div>
+        <div class="col">
+          <h3>After (what a model may receive)</h3>
+          <pre class="view" id="after"></pre>
+        </div>
+      </div>
+      <div class="shots" id="shots" hidden>
+        <img id="shotB" alt="Screenshot before redaction" /><img
+          id="shotA"
+          alt="Screenshot after redaction"
+        />
+      </div>
+      <p class="small" id="pstats"></p>
+    </section>
+
+    <section class="pane" id="p-settings">
+      <label for="provider">Model provider</label>
+      <select id="provider">
+        <option value="mock">
+          Offline demo agent (no model, nothing leaves the device)
+        </option>
+        <option value="ollama">Ollama (local)</option>
+        <option value="openai">OpenAI-compatible API</option>
+        <option value="anthropic">Anthropic API</option>
+      </select>
+      <label for="endpoint">Endpoint</label
+      ><input id="endpoint" placeholder="http://localhost:11434" />
+      <label for="model">Model</label><input id="model" />
+      <label for="apiKey"
+        >API key (stored locally, sent only as a request header)</label
+      ><input id="apiKey" type="password" autocomplete="off" />
+      <div class="chk">
+        <input type="checkbox" id="localOnly" /><label
+          for="localOnly"
+          style="margin: 0"
+          >Local-only mode: block any endpoint that is not localhost</label
+        >
+      </div>
+      <div class="chk">
+        <input type="checkbox" id="sendScreenshots" /><label
+          for="sendScreenshots"
+          style="margin: 0"
+          >Send redacted screenshots to vision models</label
+        >
+      </div>
+      <div class="chk">
+        <input type="checkbox" id="strictMessages" /><label
+          for="strictMessages"
+          style="margin: 0"
+          >Hide the full text of chat/private messages</label
+        >
+      </div>
+      <label for="selectors"
+        >Your own redaction rules: CSS selectors, one per line</label
+      ><textarea
+        id="selectors"
+        placeholder=".account-balance&#10;#internal-notes"
+      ></textarea>
+      <label for="patterns"
+        >Your own regex patterns: TYPE=regex, one per line</label
+      ><textarea id="patterns" placeholder="EMPID=EMP-\d{6}"></textarea>
+      <label for="vault"
+        >Vault (JSON). Values are injected locally and never sent to a
+        model.</label
+      >
+      <textarea
+        id="vault"
+        spellcheck="false"
+        placeholder='{"email":"demo@example.com","card_number":{"value":"4111 1111 1111 1111","origins":["shop.example"]}}'
+      ></textarea>
+      <div class="row">
+        <button class="primary" id="save">Save settings</button>
+      </div>
+    </section>
+
+    <section class="pane" id="p-log">
+      <pre class="view" id="log"></pre>
+      <div class="row">
+        <button id="refreshLog">Refresh</button
+        ><button id="clearLog">Clear log</button>
+      </div>
+      <p class="small">
+        The log holds event types and counts only. It never contains page text,
+        values or prompts, and it is cleared when the browser closes.
+      </p>
+    </section>
+    <script src="../src/detector.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
