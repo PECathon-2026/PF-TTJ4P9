@@ -1,0 +1,10 @@
+{
+  "name": "privacylens",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:pages": "node test/build-pages.js",
+    "eval": "node test/eval.js"
+  },
+  "devDependencies": { "playwright": "^1.56.0" }
+}
